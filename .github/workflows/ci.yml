@@ -1,48 +1,63 @@
-name: CI Terraform + dbt
+name: CI
 
 on:
   push:
-    branches: [main]
     paths:
       - 'terraform/**'
       - 'dbt/**'
-  pull_request:
   workflow_dispatch:
 
+env:
+  SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+  SF_USER:    ${{ secrets.SF_USER }}
+  SF_PWD:     ${{ secrets.SF_PWD }}
+
 jobs:
-  terraform:
-    name: Terraform Plan & Apply
+  deploy-terraform:
+    name: Deploy Terraform
     runs-on: ubuntu-latest
+
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: hashicorp/setup-terraform@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.0
-      - run: terraform init
-        working-directory: terraform
-      - run: terraform plan
-        working-directory: terraform
-      - run: terraform apply -auto-approve
-        working-directory: terraform
 
-  dbt-run:
-    name: Run dbt (Bronze → Gold)
-    needs: terraform
+      - name: Terraform Init & Validate
+        working-directory: terraform/
+        run: |
+          terraform fmt -check
+          terraform init
+          terraform validate
+
+  deploy-dbt:
+    name: Deploy dbt
+    needs: deploy-terraform
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - run: pip install dbt-snowflake
-      - run: |
+
+      - name: Install dbt
+        run: pip install dbt-snowflake
+
+      - name: Run dbt models
+        working-directory: dbt
+        run: |
           dbt deps
           dbt build --select silver+
-        working-directory: dbt
         env:
           DBT_PROFILES_DIR: .
           SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
