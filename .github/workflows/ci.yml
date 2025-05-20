@@ -13,6 +13,9 @@ jobs:
     name: Terraform Plan & Apply
     runs-on: ubuntu-latest
 
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -51,11 +54,11 @@ jobs:
       - name: Install dbt
         run: pip install dbt-snowflake
 
-      - name: Run dbt
+      - name: Run dbt models
         working-directory: dbt
         run: |
           dbt deps
-          dbt build --select silver+  # ou remplace par 'dbt run' si tu préfères
+          dbt build --select silver+  # adapte si tu veux tout exécuter
         env:
           DBT_PROFILES_DIR: .
           SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
