@@ -54,11 +54,11 @@ jobs:
       - name: Install dbt
         run: pip install dbt-snowflake
 
-      - name: Run dbt models
+      - name: Run dbt
         working-directory: dbt
         run: |
           dbt deps
-          dbt build --select silver+  # adapte si tu veux tout exécuter
+          dbt build --select silver+  # ou remplace par 'dbt run' si tu préfères
         env:
           DBT_PROFILES_DIR: .
           SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
