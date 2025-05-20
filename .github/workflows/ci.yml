@@ -1,7 +1,7 @@
 name: CI Terraform + dbt
-
 on:
   push:
+    branches: [main]
     paths:
       - 'terraform/**'
       - 'dbt/**'
