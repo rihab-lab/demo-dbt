@@ -9,3 +9,4 @@ models:
     raw:
       +schema: RAW_LAYER   # ← pour forcer RAW_LAYER même si profil dit autre chose
       +materialized: table
+      +schema_suffix: ""
