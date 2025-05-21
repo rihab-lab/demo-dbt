@@ -5,5 +5,7 @@ profile: demo_dbt_profile
 model-paths: ["models"]
 
 models:
-  demo_dbt_project:
-    +materialized: view
+  demo_dbt:
+    raw:
+      +schema: RAW_LAYER
+      +materialized: table
