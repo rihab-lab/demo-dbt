@@ -5,7 +5,7 @@ profile: demo_dbt_profile
 model-paths: ["models"]
 
 models:
-  demo_dbt:
+  demo_dbt:                # ← doit correspondre au `name:` juste au-dessus
     raw:
-      +schema: RAW_LAYER
+      +schema: RAW_LAYER   # ← pour forcer RAW_LAYER même si profil dit autre chose
       +materialized: table
