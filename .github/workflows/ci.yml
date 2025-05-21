@@ -57,7 +57,7 @@ jobs:
         working-directory: dbt
         run: |
           dbt deps
-          dbt build --select raw+     # 🔁 tu peux changer ici selon ton niveau (raw+, bronze+, etc.)
+          dbt build --select raw+     
         env:
           DBT_PROFILES_DIR: .
           SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
@@ -66,3 +66,5 @@ jobs:
           SF_ROLE: ${{ secrets.SF_ROLE }}
           SF_DATABASE: ${{ secrets.SF_DATABASE }}
           SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+
+    
