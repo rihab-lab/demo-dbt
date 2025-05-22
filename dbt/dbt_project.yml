@@ -2,7 +2,7 @@ name: demo_dbt
 version: "1.0"
 profile: demo_dbt_profile
 
-model-paths: ["dbt/models"]   # <- correspond exactement à ton arborescence
+model-paths: ["models"]
 
 models:
   dbt:
