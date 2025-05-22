@@ -1,12 +1,14 @@
 # dbt/dbt_project.yml
 config-version: 2
 
-name: 'demo_dbt'
+name: 'demo-dbt'
 version: '1.0'
-profile: 'demo_dbt_profile'
+profile: 'demo-dbt_profile'
+
+model-paths: ["models"]
 
 models:
-  # on ne met plus demo_dbt: ici
-  raw:
-    +schema: RAW_LAYER
-    +materialized: table
+  demo-dbt:          # ← impératif : ce nom doit matcher le champ `name:` plus haut
+    raw:             # ← on cible le dossier models/raw/
+      +schema: RAW_LAYER
+      +materialized: table

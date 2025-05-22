@@ -1,4 +1,7 @@
-{{ config(materialized='table') }}
+{{ config(
+    materialized='table',
+    schema='RAW_LAYER'
+) }}
 
 SELECT
     CAST(NULL AS STRING)         AS HouseKey,
