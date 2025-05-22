@@ -39,10 +39,8 @@ jobs:
     needs: deploy-terraform
     runs-on: ubuntu-latest
     env:
-      # on indique à dbt de charger dbt/profiles.yml
-      DBT_PROFILES_DIR: dbt
-
-      # variables Snowflake
+      # On pointe vers le dossier dbt/ et non dbt/dbt/
+      DBT_PROFILES_DIR: .
       SF_ACCOUNT:   ${{ secrets.SF_ACCOUNT }}
       SF_USER:      ${{ secrets.SF_USER }}
       SF_PASSWORD:  ${{ secrets.SF_PWD }}
@@ -63,12 +61,11 @@ jobs:
         run: pip install dbt-snowflake
 
       - name: Debug dbt config
-        run: |
-          cd dbt
-          dbt debug
+        working-directory: dbt
+        run: dbt debug
 
       - name: Run raw models only
+        working-directory: dbt
         run: |
-          cd dbt
           dbt deps
           dbt run --models raw.* --debug
