@@ -1,8 +1,0 @@
-version: 2
-
-sources:
-  - name: external          # c’est le namespace que tu utilises dans {{ source('external','events') }}
-    database: "{{ env_var('SF_DATABASE') }}"  # même valeur que dans profiles.yml
-    schema: "raw_layer"     # ou le schéma Terraform qui contient ta table events
-    tables:
-      - name: events        # correspond à la table physicale raw_layer.events
