@@ -5,8 +5,16 @@ profile: demo_dbt_profile
 model-paths: ["models"]
 
 models:
-  demo_dbt:                # ← doit correspondre au `name:` juste au-dessus
+  demo_dbt:
     raw:
-      +schema: RAW_LAYER   # ← pour forcer RAW_LAYER même si profil dit autre chose
+      +schema: RAW_LAYER
       +materialized: table
-      +schema_suffix: ""
+    bronze:
+      +schema: BRONZE_LAYER
+      +materialized: table
+    silver:
+      +schema: SILVER_LAYER
+      +materialized: table
+    gold:
+      +schema: GOLD_LAYER
+      +materialized: table
