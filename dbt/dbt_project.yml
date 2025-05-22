@@ -1,14 +1,14 @@
-name: demo_dbt
-version: "1.0"
-profile: demo_dbt_profile
+# ⚠️ absolument nécessaire pour que les configs `+schema` par dossier fonctionnent
+config-version: 2
+
+name: 'demo_dbt'
+version: '1.0'
+profile: 'demo_dbt_profile'
 
 model-paths: ["models"]
 
 models:
   demo_dbt:
-    +schema_suffix: ""
     raw:
-      +schema: RAW_LAYER
+      +schema: RAW_LAYER     # override du schéma PROFILE.schema
       +materialized: table
-      +schema_suffix: ""
-    
