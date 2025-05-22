@@ -1,4 +1,3 @@
-# dbt_project.yml  (à la racine du repo)
 config-version: 2
 
 name: 'demo_dbt'
@@ -10,5 +9,6 @@ model-paths: ["models"]
 models:
   demo_dbt:
     raw:
-      +schema: RAW_LAYER       # override complet du schema
+      +schema: RAW_LAYER
       +materialized: table
+
