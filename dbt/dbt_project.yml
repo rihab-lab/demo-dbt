@@ -1,12 +1,12 @@
+# dbt/dbt_project.yml
 config-version: 2
-name: 'demo_dbt'         # ⬅️ si ton dossier s’appelle demo-dbt, pense à matcher ici
+
+name: 'demo_dbt'
 version: '1.0'
 profile: 'demo_dbt_profile'
 
-model-paths: ["models"]
-
 models:
-  demo_dbt:
-    raw:
-      +schema: RAW_LAYER
-      +materialized: table
+  # on ne met plus demo_dbt: ici
+  raw:
+    +schema: RAW_LAYER
+    +materialized: table
