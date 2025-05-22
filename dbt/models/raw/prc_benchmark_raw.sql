@@ -1,10 +1,11 @@
+-- dbt/models/raw/prc_benchmark_raw.sql
+
 {{ config(
-    materialized = 'table',
-    database     = 'TEST_POC_VISEO_DB',   -- explicitement, si ta db par défaut n’est pas celle-ci
-    schema       = 'RAW_LAYER'
+    materialized = "table",
+    database     = "TEST_POC_VISEO_DB",
+    schema       = "RAW_LAYER"
 ) }}
 
--- CTAS vide : on crée seulement la structure, sans ligne
 select
   cast(null as varchar(16777216))     as APUKCode,
   cast(null as varchar(16777216))     as Anabench2Code,
