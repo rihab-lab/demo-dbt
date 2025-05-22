@@ -6,15 +6,20 @@ model-paths: ["models"]
 
 models:
   demo_dbt:
+    +schema_suffix: ""
     raw:
       +schema: RAW_LAYER
       +materialized: table
+      +schema_suffix: ""
     bronze:
       +schema: BRONZE_LAYER
       +materialized: table
+      +schema_suffix: ""
     silver:
       +schema: SILVER_LAYER
       +materialized: table
+      +schema_suffix: ""
     gold:
       +schema: GOLD_LAYER
       +materialized: table
+      +schema_suffix: ""
