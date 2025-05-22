@@ -1,15 +1,9 @@
 name: demo_dbt
-version: '1.0'
-
-# <- doit matcher "demo_dbt_profile" de profiles.yml
 profile: demo_dbt_profile
 
 model-paths: ["models"]
-target-path: "target"
-clean-targets: ["target", "dbt_modules"]
 
 models:
   demo_dbt:
     raw:
-      +schema: raw_layer
       +materialized: table
