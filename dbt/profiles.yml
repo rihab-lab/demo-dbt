@@ -9,5 +9,5 @@ demo_dbt_profile:
       role: "{{ env_var('SF_ROLE') }}"
       database: "{{ env_var('SF_DATABASE') }}"
       warehouse: "{{ env_var('SF_WAREHOUSE') }}"
-      schema: PUBLIC
+      #schema: PUBLIC
       threads: 4
