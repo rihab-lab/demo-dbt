@@ -1,4 +1,4 @@
-# ⚠️ absolument nécessaire pour que les configs `+schema` par dossier fonctionnent
+# dbt_project.yml  (à la racine du repo)
 config-version: 2
 
 name: 'demo_dbt'
@@ -10,5 +10,5 @@ model-paths: ["models"]
 models:
   demo_dbt:
     raw:
-      +schema: RAW_LAYER     # override du schéma PROFILE.schema
+      +schema: RAW_LAYER       # override complet du schema
       +materialized: table
