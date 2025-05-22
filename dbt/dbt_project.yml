@@ -1,13 +1,5 @@
-config-version: 2
-
-name: 'demo_dbt'         # ← ici, underscore à la place du tiret
-version: '1.0'
-profile: 'demo_dbt_profile'
-
-model-paths: ["models"]
-
 models:
-  demo_dbt:             # ← doit matcher exactement le name: ci-dessus
+  demo_dbt:          # remplace par le name: de ton projet
     raw:
-      +schema: RAW_LAYER
+      +schema: raw_layer
       +materialized: table
