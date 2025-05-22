@@ -1,6 +1,5 @@
 config-version: 2
-
-name: 'demo_dbt'
+name: 'demo_dbt'         # ⬅️ si ton dossier s’appelle demo-dbt, pense à matcher ici
 version: '1.0'
 profile: 'demo_dbt_profile'
 
@@ -11,4 +10,3 @@ models:
     raw:
       +schema: RAW_LAYER
       +materialized: table
-

@@ -8,63 +8,59 @@ on:
   workflow_dispatch:
 
 env:
+  # ces vars seront héritées par tous les jobs
   SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
   SF_USER:    ${{ secrets.SF_USER }}
   SF_PWD:     ${{ secrets.SF_PWD }}
 
 jobs:
   deploy-terraform:
-    name: Deploy Terraform
     runs-on: ubuntu-latest
-
-    env:
-      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.0
-
-      - name: Terraform Init & Validate
-        working-directory: terraform/
-        run: |
+      - run: |
           terraform fmt -check
           terraform init
           terraform validate
+        working-directory: terraform/
 
   deploy-dbt:
-    name: Deploy dbt
     needs: deploy-terraform
     runs-on: ubuntu-latest
 
+    # on indique explicitement à dbt où trouver profiles.yml
+    env:
+      DBT_PROFILES_DIR: dbt
+      SF_ACCOUNT:   ${{ secrets.SF_ACCOUNT }}
+      SF_USER:      ${{ secrets.SF_USER }}
+      SF_PASSWORD:  ${{ secrets.SF_PWD }}
+      SF_ROLE:      ${{ secrets.SF_ROLE }}
+      SF_DATABASE:  ${{ secrets.SF_DATABASE }}
+      SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Install dbt
+      - name: Install dbt Snowflake
         run: pip install dbt-snowflake
 
-      - name: Run dbt models
-        working-directory: dbt
+      - name: Debug dbt (connexion + config)
         run: |
-          dbt deps
-          dbt build --select raw+     
-        env:
-          DBT_PROFILES_DIR: .
-          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SF_USER: ${{ secrets.SF_USER }}
-          SF_PASSWORD: ${{ secrets.SF_PWD }}
-          SF_ROLE: ${{ secrets.SF_ROLE }}
-          SF_DATABASE: ${{ secrets.SF_DATABASE }}
-          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+          cd dbt
+          dbt debug
+        # On ne précise pas de working-directory dans le run grâce au `cd`
 
-    
+      - name: Run models in raw/
+        run: |
+          cd dbt
+          dbt deps
+          # Ici on cible explicitement le dossier raw via raw.*
+          dbt run --models raw.* --debug
