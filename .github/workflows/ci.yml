@@ -16,10 +16,8 @@ jobs:
   deploy-terraform:
     name: Deploy Terraform
     runs-on: ubuntu-latest
-
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -37,12 +35,14 @@ jobs:
           terraform validate
 
   deploy-dbt:
+    name: Deploy dbt
     needs: deploy-terraform
     runs-on: ubuntu-latest
-
-    # on indique explicitement à dbt où trouver profiles.yml
     env:
+      # on indique à dbt de charger dbt/profiles.yml
       DBT_PROFILES_DIR: dbt
+
+      # variables Snowflake
       SF_ACCOUNT:   ${{ secrets.SF_ACCOUNT }}
       SF_USER:      ${{ secrets.SF_USER }}
       SF_PASSWORD:  ${{ secrets.SF_PWD }}
@@ -51,7 +51,8 @@ jobs:
       SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -61,17 +62,13 @@ jobs:
       - name: Install dbt Snowflake
         run: pip install dbt-snowflake
 
-      - name: Debug dbt (connexion + config)
+      - name: Debug dbt config
         run: |
           cd dbt
           dbt debug
-        # On ne précise pas de working-directory dans le run grâce au `cd`
 
-      - name: Run models in raw/
+      - name: Run raw models only
         run: |
           cd dbt
           dbt deps
-          # Ici on cible explicitement le dossier raw via raw.*
           dbt run --models raw.* --debug
-
-    
