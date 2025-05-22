@@ -1,16 +1,14 @@
 name: demo_dbt
 version: "1.0"
-config-version: 2          
+profile: demo_dbt_profile
 
 model-paths: ["models"]
 
 models:
   demo_dbt:
-    +schema_suffix: ""      # désactive tout suffixe automatique
-
-    # Modèles RAW → DAS tables dans RAW_LAYER
+    +schema_suffix: ""
     raw:
       +schema: RAW_LAYER
       +materialized: table
-
-   
+      +schema_suffix: ""
+    
