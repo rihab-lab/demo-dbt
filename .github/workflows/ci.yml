@@ -64,9 +64,9 @@ jobs:
         working-directory: dbt
         run: dbt debug
 
-      - name: Run raw models only
+      - name: Run raw and bronze models
         working-directory: dbt
         run: |
           dbt deps
-          dbt run --models tag:raw tag:bronze --debug
+          dbt run --models raw.* bronze.*
 
