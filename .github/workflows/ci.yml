@@ -68,4 +68,5 @@ jobs:
         working-directory: dbt
         run: |
           dbt deps
-          dbt run --models raw.* --debug
+          dbt run --models tag:raw tag:bronze --debug
+
