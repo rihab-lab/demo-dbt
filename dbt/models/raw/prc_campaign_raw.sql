@@ -4,10 +4,10 @@
     schema       = "RAW_LAYER"
 ) }}
 
--- CTAS vide pour ne créer que la structure
+
 select
-  cast(null as varchar(16777216))    as HouseKey           -- NOT NULL, tu pourras ajouter un test dbt
-  ,cast(null as varchar(16777216))   as CampaignCode       -- NOT NULL
+  cast(null as varchar(16777216))    as HouseKey           
+  ,cast(null as varchar(16777216))   as CampaignCode       
   ,cast(null as varchar(16777216))   as CampaignName
   ,cast(null as varchar(16777216))   as CampaignDescription
   ,cast(null as varchar(16777216))   as HistoricalSellInFirstMonth

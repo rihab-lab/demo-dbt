@@ -1,11 +1,11 @@
-demo_dbt_profile:          # <-- doit matcher profile: dans dbt_project.yml
+demo_dbt_profile:          
   target: dev
   outputs:
     dev:
       type: snowflake
       account: "{{ env_var('SF_ACCOUNT') }}"
       user:    "{{ env_var('SF_USER') }}"
-      password: "{{ env_var('SF_PASSWORD') }}"   # ajoute bien un espace après :
+      password: "{{ env_var('SF_PASSWORD') }}"   
       role:     "{{ env_var('SF_ROLE') }}"
       database: "TEST_POC_VISEO_DB"
       warehouse: "{{ env_var('SF_WAREHOUSE') }}"
