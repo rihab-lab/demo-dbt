@@ -1,9 +1,17 @@
-{{ config(
+{{ 
+  config(
     materialized = "table",
     database     = "TEST_POC_VISEO_DB",
-    schema       = "RAW_LAYER"
-) }}
-
+    schema       = "RAW_LAYER",
+    post_hook    = [
+      -- appelle ta macro de copy_with_metadata
+      "{{ copy_into_raw(
+           table_name     = this.identifier,
+           prefix_pattern = 'PRC_CAMPAIGN'
+         ) }}"
+    ]
+  ) 
+}}
 
 select
   cast(null as varchar(16777216))    as HouseKey           
