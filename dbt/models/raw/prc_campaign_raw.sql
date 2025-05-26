@@ -1,6 +1,5 @@
 -- models/raw/prc_campaign_raw.sql
 
--- Unique key pour ne jamais recharger deux fois le même fichier
 {{ 
   config(
     materialized = "incremental",
@@ -11,6 +10,7 @@
 }}
 
 with staged as (
+
   select
     t.$1::varchar(16777216)               as HOUSEKEY,
     t.$2::varchar(16777216)               as CAMPAIGNCODE,
@@ -21,7 +21,12 @@ with staged as (
     t.$7::varchar(16777216)               as CAMPAIGNDATE,
     t.metadata$filename                   as FILE_NAME,
     t.metadata$created_on::timestamp_ltz  as SYS_SOURCE_DATE
-  from @{{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE as t
+
+  from @
+    {{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE
+      ( FILE_FORMAT => '{{ this.schema }}.FF_CSV' )
+    as t
+
   where t.metadata$filename like 'PRC_CAMPAIGN_%'
 )
 

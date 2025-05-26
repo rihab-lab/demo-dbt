@@ -1,6 +1,5 @@
 -- models/raw/prc_benchmark_raw.sql
 
--- On ne rechargera jamais deux fois un même fichier grâce à unique_key
 {{ 
   config(
     materialized = "incremental",
@@ -11,6 +10,7 @@
 }}
 
 with staged as (
+
   select
     t.$1::varchar(16777216)               as APUKCODE,
     t.$2::varchar(16777216)               as ANABENCH2CODE,
@@ -18,7 +18,12 @@ with staged as (
     t.$4::varchar(16777216)               as SKUGROUP,
     t.metadata$filename                   as FILE_NAME,
     t.metadata$created_on::timestamp_ltz  as SYS_SOURCE_DATE
-  from @{{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE as t
+
+  from @
+    {{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE
+      ( FILE_FORMAT => '{{ this.schema }}.FF_CSV' )
+    as t
+
   where t.metadata$filename like 'PRC_BENCHMARK_%'
 )
 
