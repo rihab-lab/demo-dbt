@@ -1,18 +1,8 @@
--- dbt/models/raw/prc_benchmark_raw.sql
-
-{{ 
-  config(
+{{ config(
     materialized = "table",
     database     = "TEST_POC_VISEO_DB",
-    schema       = "RAW_LAYER",
-    post_hook    = [
-      "{{ copy_into_raw(
-           table_name     = this.identifier,
-           prefix_pattern = 'PRC_BENCHMARK'
-         ) }}"
-    ]
-  ) 
-}}
+    schema       = "RAW_LAYER"
+) }}
 
 select
   cast(null as varchar(16777216))     as APUKCode,
