@@ -1,4 +1,4 @@
-{{ 
+{{  
   config(
     materialized = "table",
     database     = "TEST_POC_VISEO_DB",
@@ -9,7 +9,7 @@
            prefix_pattern = 'PRC_BENCHMARK'
          ) }}"
     ]
-  ) 
+  )  
 }}
 select
   cast(null as varchar(16777216))     as APUKCode,
