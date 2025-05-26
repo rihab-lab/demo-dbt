@@ -1,38 +1,29 @@
 {{ 
   config(
-    materialized = "table",
+    materialized = "incremental",
     database     = "TEST_POC_VISEO_DB",
     schema       = "RAW_LAYER",
-    post_hook    = [
-      "{{ copy_into_raw(
-           table_name     = this.identifier,
-           prefix_pattern = 'PRC_BENCHMARK',
-           columns        = [
-             'APUKCODE',
-             'ANABENCH2CODE',
-             'ANABENCH2',
-             'SKUGROUP',
-             'FILE_NAME',
-             'SYS_SOURCE_DATE'
-           ],
-           select_exprs   = [
-             't.$1          AS APUKCODE',
-             't.$2          AS ANABENCH2CODE',
-             't.$3          AS ANABENCH2',
-             't.$4          AS SKUGROUP',
-             'METADATA$FILENAME   AS FILE_NAME',
-             'METADATA$CREATED_ON AS SYS_SOURCE_DATE'
-           ]
-         ) }}"
-    ]
-  ) 
+    unique_key   = "FILE_NAME"   -- on ne rechargera jamais deux fois un même fichier
+  )
 }}
 
-select
-  cast(null as varchar(16777216)) as APUKCode,
-  cast(null as varchar(16777216)) as Anabench2Code,
-  cast(null as varchar(16777216)) as Anabench2,
-  cast(null as varchar(16777216)) as SKUGroup,
-  cast(null as varchar(16777216)) as FILE_NAME,
-  cast(null as timestamp_ltz)     as SYS_SOURCE_DATE
-where false
+with staged as (
+  select
+    $1::varchar(16777216)                         as APUKCode,
+    $2::varchar(16777216)                         as Anabench2Code,
+    $3::varchar(16777216)                         as Anabench2,
+    $4::varchar(16777216)                         as SKUGroup,
+    metadata$filename                             as FILE_NAME,
+    metadata$created_on::timestamp_ltz            as SYS_SOURCE_DATE
+  from @{{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE
+  where metadata$filename like 'PRC_BENCHMARK_%'
+)
+
+select * from staged
+
+{% if is_incremental() %}
+  -- sur les runs suivants, on ne prend que les fichiers plus récents que le max déjà chargé
+  where SYS_SOURCE_DATE > (
+    select max(SYS_SOURCE_DATE) from {{ this }}
+  )
+{% endif %}

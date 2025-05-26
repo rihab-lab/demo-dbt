@@ -1,47 +1,31 @@
 {{ 
   config(
-    materialized = "table",
+    materialized = "incremental",
     database     = "TEST_POC_VISEO_DB",
     schema       = "RAW_LAYER",
-    post_hook    = [
-      "{{ copy_into_raw(
-           table_name     = this.identifier,
-           prefix_pattern = 'PRC_CAMPAIGN',
-           columns        = [
-             'HOUSEKEY',
-             'CAMPAIGNCODE',
-             'CAMPAIGNNAME',
-             'CAMPAIGNDESCRIPTION',
-             'HISTORICALSELLINFIRSTMONTH',
-             'HISTORICALSELLINLASTMONTH',
-             'CAMPAIGNDATE',
-             'FILE_NAME',
-             'SYS_SOURCE_DATE'
-           ],
-           select_exprs   = [
-             't.$1          AS HOUSEKEY',
-             't.$2          AS CAMPAIGNCODE',
-             't.$3          AS CAMPAIGNNAME',
-             't.$4          AS CAMPAIGNDESCRIPTION',
-             't.$5          AS HISTORICALSELLINFIRSTMONTH',
-             't.$6          AS HISTORICALSELLINLASTMONTH',
-             't.$7          AS CAMPAIGNDATE',
-             'METADATA$FILENAME   AS FILE_NAME',
-             'METADATA$CREATED_ON AS SYS_SOURCE_DATE'
-           ]
-         ) }}"
-    ]
-  ) 
+    unique_key   = "FILE_NAME"
+  )
 }}
 
-select
-  cast(null as varchar(16777216)) as HouseKey,
-  cast(null as varchar(16777216)) as CampaignCode,
-  cast(null as varchar(16777216)) as CampaignName,
-  cast(null as varchar(16777216)) as CampaignDescription,
-  cast(null as varchar(16777216)) as HistoricalSellInFirstMonth,
-  cast(null as varchar(16777216)) as HistoricalSellInLastMonth,
-  cast(null as varchar(16777216)) as CampaignDate,
-  cast(null as varchar(16777216)) as FILE_NAME,
-  cast(null as timestamp_ltz)     as SYS_SOURCE_DATE
-where false
+with staged as (
+  select
+    $1::varchar(16777216)                         as HouseKey,
+    $2::varchar(16777216)                         as CampaignCode,
+    $3::varchar(16777216)                         as CampaignName,
+    $4::varchar(16777216)                         as CampaignDescription,
+    $5::varchar(16777216)                         as HistoricalSellInFirstMonth,
+    $6::varchar(16777216)                         as HistoricalSellInLastMonth,
+    $7::varchar(16777216)                         as CampaignDate,
+    metadata$filename                             as FILE_NAME,
+    metadata$created_on::timestamp_ltz            as SYS_SOURCE_DATE
+  from @{{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE
+  where metadata$filename like 'PRC_CAMPAIGN_%'
+)
+
+select * from staged
+
+{% if is_incremental() %}
+  where SYS_SOURCE_DATE > (
+    select max(SYS_SOURCE_DATE) from {{ this }}
+  )
+{% endif %}
