@@ -8,6 +8,6 @@ from (
   from @{{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE t
   where metadata$filename like '{{ prefix_pattern }}_%'
 )
-file_format = (format_name => '{{ this.schema }}.FF_CSV')
+file_format = (format_name = '{{ this.schema }}.FF_CSV')
 on_error = 'continue';
 {% endmacro %}
