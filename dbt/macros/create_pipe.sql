@@ -23,7 +23,7 @@ CREATE OR REPLACE PIPE {{ db }}.{{ sch }}.PRC_BENCHMARK_PIPE
     FROM @{{ stage }}
     WHERE metadata$filename LIKE 'PRC_BENCHMARK_%'
   )
-  FILE_FORMAT = (FORMAT_NAME => '{{ fmt }}')
+  FILE_FORMAT = (FORMAT_NAME = '{{ fmt }}')
   ON_ERROR    = 'CONTINUE'
 ;
 
@@ -49,7 +49,7 @@ CREATE OR REPLACE PIPE {{ db }}.{{ sch }}.PRC_CAMPAIGN_PIPE
     FROM @{{ stage }}
     WHERE metadata$filename LIKE 'PRC_CAMPAIGN_%'
   )
-  FILE_FORMAT = (FORMAT_NAME => '{{ fmt }}')
+  FILE_FORMAT = (FORMAT_NAME = '{{ fmt }}')
   ON_ERROR    = 'CONTINUE'
 ;
 {% endmacro %}
