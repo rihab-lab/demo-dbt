@@ -12,14 +12,14 @@
 
 with staged as (
   select
-    $1::varchar(16777216)              as APUKCode,
-    $2::varchar(16777216)              as Anabench2Code,
-    $3::varchar(16777216)              as Anabench2,
-    $4::varchar(16777216)              as SKUGroup,
-    metadata$filename                  as FILE_NAME,
-    metadata$created_on::timestamp_ltz as SYS_SOURCE_DATE
-  from @{{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE
-  where metadata$filename like 'PRC_BENCHMARK_%'
+    t.$1::varchar(16777216)               as APUKCODE,
+    t.$2::varchar(16777216)               as ANABENCH2CODE,
+    t.$3::varchar(16777216)               as ANABENCH2,
+    t.$4::varchar(16777216)               as SKUGROUP,
+    t.metadata$filename                   as FILE_NAME,
+    t.metadata$created_on::timestamp_ltz  as SYS_SOURCE_DATE
+  from @{{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE as t
+  where t.metadata$filename like 'PRC_BENCHMARK_%'
 )
 
 select * from staged
