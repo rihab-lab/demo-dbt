@@ -1,36 +1,16 @@
--- models/raw/prc_benchmark_raw.sql
-
-{{ 
-  config(
-    materialized = "incremental",
+{{ config(
+    materialized = "table",
     database     = "TEST_POC_VISEO_DB",
-    schema       = "RAW_LAYER",
-    unique_key   = "FILE_NAME"
-  )
-}}
+    schema       = "RAW_LAYER"
+) }}
 
-with staged as (
 
-  select
-    t.$1::varchar(16777216)               as APUKCODE,
-    t.$2::varchar(16777216)               as ANABENCH2CODE,
-    t.$3::varchar(16777216)               as ANABENCH2,
-    t.$4::varchar(16777216)               as SKUGROUP,
-    t.metadata$filename                   as FILE_NAME,
-    t.metadata$created_on::timestamp_ltz  as SYS_SOURCE_DATE
-
-  from @
-    {{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE
-      ( FILE_FORMAT => '{{ this.schema }}.FF_CSV' )
-    as t
-
-  where t.metadata$filename like 'PRC_BENCHMARK_%'
-)
-
-select * from staged
-
-{% if is_incremental() %}
-  where SYS_SOURCE_DATE > (
-    select max(SYS_SOURCE_DATE) from {{ this }}
-  )
-{% endif %}
+select
+  cast(null as varchar(16777216))    as APUKCode,
+  cast(null as varchar(16777216))    as Anabench2Code,
+  cast(null as varchar(16777216))    as Anabench2,
+  cast(null as varchar(16777216))    as SKUGroup,
+  cast(null as varchar(16777216))    as SYS_SOURCE_DATE,
+  cast(null as varchar(16777216))    as FILE_NAME,
+  cast(current_timestamp() as timestamp_ntz(9)) as LOAD_TIME
+where false

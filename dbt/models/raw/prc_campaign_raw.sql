@@ -1,39 +1,19 @@
--- models/raw/prc_campaign_raw.sql
-
-{{ 
-  config(
-    materialized = "incremental",
+{{ config(
+    materialized = "table",
     database     = "TEST_POC_VISEO_DB",
-    schema       = "RAW_LAYER",
-    unique_key   = "FILE_NAME"
-  )
-}}
+    schema       = "RAW_LAYER"
+) }}
 
-with staged as (
-
-  select
-    t.$1::varchar(16777216)               as HOUSEKEY,
-    t.$2::varchar(16777216)               as CAMPAIGNCODE,
-    t.$3::varchar(16777216)               as CAMPAIGNNAME,
-    t.$4::varchar(16777216)               as CAMPAIGNDESCRIPTION,
-    t.$5::varchar(16777216)               as HISTORICALSELLINFIRSTMONTH,
-    t.$6::varchar(16777216)               as HISTORICALSELLINLASTMONTH,
-    t.$7::varchar(16777216)               as CAMPAIGNDATE,
-    t.metadata$filename                   as FILE_NAME,
-    t.metadata$created_on::timestamp_ltz  as SYS_SOURCE_DATE
-
-  from @
-    {{ this.database }}.{{ this.schema }}.EXTERNAL_AZURE_STAGE
-      ( FILE_FORMAT => '{{ this.schema }}.FF_CSV' )
-    as t
-
-  where t.metadata$filename like 'PRC_CAMPAIGN_%'
-)
-
-select * from staged
-
-{% if is_incremental() %}
-  where SYS_SOURCE_DATE > (
-    select max(SYS_SOURCE_DATE) from {{ this }}
-  )
-{% endif %}
+-- CTAS vide pour ne créer que la structure
+select
+  cast(null as varchar(16777216))    as HouseKey           -- NOT NULL, tu pourras ajouter un test dbt
+  ,cast(null as varchar(16777216))   as CampaignCode       -- NOT NULL
+  ,cast(null as varchar(16777216))   as CampaignName
+  ,cast(null as varchar(16777216))   as CampaignDescription
+  ,cast(null as varchar(16777216))   as HistoricalSellInFirstMonth
+  ,cast(null as varchar(16777216))   as HistoricalSellInLastMonth
+  ,cast(null as varchar(16777216))   as CampaignDate
+  ,cast(null as varchar(16777216))   as SYS_SOURCE_DATE
+  ,cast(null as varchar(16777216))   as FILE_NAME
+  ,cast(current_timestamp() as timestamp_ntz(9)) as LOAD_TIME
+where false
