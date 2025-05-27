@@ -5,7 +5,7 @@
     {% set messages = [] %}
 
     {% for pipe in pipes %}
-        {% set qualified_pipe_name = 'TEST_POC_VISEO_DB.RAW_LAYER.' ~ pipe.name %}
+        {% set qualified_pipe_name = target.database ~ '.' ~ target.schema ~ '.' ~ pipe.name %}
         {% set sql %}
             create or replace pipe {{ qualified_pipe_name }} as
             copy into {{ pipe.table }}
