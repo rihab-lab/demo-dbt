@@ -38,12 +38,12 @@
         {% endset %}
 
         {# Vérifie si le pipe existe déjà #}
-        {% set check_pipe_query %}
-            select count(*) from information_schema.pipes
-            where pipe_name = upper('{{ pipe.name }}')
-              and table_schema = upper('{{ schema }}')
-              and table_catalog = upper('{{ database }}')
-        {% endset %}
+       {% set check_pipe_query %}
+       select count(*) from information_schema.pipes
+       where PIPE_NAME = upper('{{ pipe.name }}')
+      and TABLE_SCHEMA = upper('{{ schema }}')
+      and TABLE_CATALOG = upper('{{ database }}')
+{% endset %}
         {% set check_result = run_query(check_pipe_query) %}
         {% set pipe_exists = check_result.columns[0].values()[0] %}
 
@@ -59,12 +59,12 @@
                 {{ file_format_config }};
             {% endset %}
 
-            {% do log("✅ Création du pipe : " ~ qualified_pipe_name, info=True) %}
+            {% do log(" Création du pipe : " ~ qualified_pipe_name, info=True) %}
             {% do log("Exécution SQL : " ~ sql, info=True) %}
             {% do run_query(sql) %}
             {% do messages.append("PIPE " ~ qualified_pipe_name ~ " créé") %}
         {% else %}
-            {% do log("ℹ️ Pipe déjà existant : " ~ qualified_pipe_name ~ ", ignoré", info=True) %}
+            {% do log(" Pipe déjà existant : " ~ qualified_pipe_name ~ ", ignoré", info=True) %}
         {% endif %}
     {% endfor %}
 
