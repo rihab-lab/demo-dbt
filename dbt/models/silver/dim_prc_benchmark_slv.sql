@@ -5,7 +5,7 @@
     incremental_strategy = "merge",
     on_schema_change = "append_new_columns",
     post_hook = [
-      "alter table {{ this }} add primary key (PRICINGBENCHMARKPRCINTKEY)"
+        "alter table {{ this }} add primary key (PRICINGBENCHMARKPRCINTKEY)"
     ]
 ) }}
 
@@ -14,20 +14,20 @@ with source as (
     from {{ source('BRONZE_LAYER', 'PRC_BENCHMARK_BRZ_STREAM') }}
 ),
 
-
 deduplicated as (
     select *,
-           row_number() over (
-               partition by HOUSEKEY, CAMPAIGNCODE
-               order by LOAD_TIME desc
-           ) as row_num
+        row_number() over (
+            partition by APUKCODE, ANABENCH2CODE
+            order by LOAD_TIME desc
+        ) as row_num
     from source
 )
 
 select
-    to_numeric(hash(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2, 'N/A'))) as PRICINGBENCHMARKPRCINTKEY,
-    replace(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2, 'N/A'), ' ', '_') as PRICINGBENCHMARKPRCKEY,
+    to_number(hash(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2CODE, 'N/A'))) as PRICINGBENCHMARKPRCINTKEY,
+    replace(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2CODE, 'N/A'), ' ', '_') as PRICINGBENCHMARKPRCKEY,
     APUKCODE,
+    ANABENCH2CODE,
     ANABENCH2,
     SKUGROUP,
     SYS_SOURCE_DATE,
