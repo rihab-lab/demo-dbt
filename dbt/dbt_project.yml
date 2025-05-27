@@ -12,6 +12,5 @@ models:
     silver:
       +materialized: table
 
-# ---------- déclenchement automatique des pipes ----------
 on-run-start:
-  - "{{ create_raw_pipes() }}"
+  - "{{ create_all_pipes_from_config() }}"
