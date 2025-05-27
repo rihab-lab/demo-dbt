@@ -17,27 +17,35 @@ vars:
   SF_SCHEMA: RAW_LAYER
 
   pipe_configs:
-    - name: pipe_prc_benchmark
-      stage: EXTERNAL_AZURE_STAGE
-      table: PRC_BENCHMARK_RAW
-      pattern: ".*PRC_BENCHMARK_.*\\.csv"
-      columns:
-        - APUKCODE
-        - ANABENCH2CODE
-        - ANABENCH2
-        - SKUGroup
-        - SYS_SOURCE_DATE
+  - name: pipe_prc_campaign
+    stage: EXTERNAL_AZURE_STAGE
+    table: PRC_CAMPAIGN_RAW
+    pattern: ".*PRC_CAMPAIGN_.*\\.csv"
+    columns:
+      - HouseKey
+      - CampaignCode
+      - CampaignName
+      - CampaignDescription
+      - HistoricalSellInFirstMonth
+      - HistoricalSellInLastMonth
+      - CampaignDate
+      - SYS_SOURCE_DATE
+    file_format:
+      field_delimiter: ';'
+      skip_header: 1
+      field_optionally_enclosed_by: '"'
 
-    - name: pipe_prc_campaign
-      stage: EXTERNAL_AZURE_STAGE
-      table: PRC_CAMPAIGN_RAW
-      pattern: ".*PRC_CAMPAIGN_.*\\.csv"
-      columns:
-        - HouseKey
-        - CampaignCode
-        - CampaignName
-        - CampaignDescription
-        - HistoricalSellInFirstMonth
-        - HistoricalSellInLastMonth
-        - CampaignDate
-        - SYS_SOURCE_DATE
+  - name: pipe_prc_benchmark
+    stage: EXTERNAL_AZURE_STAGE
+    table: PRC_BENCHMARK_RAW
+    pattern: ".*PRC_BENCHMARK_.*\\.csv"
+    columns:
+      - APUKCODE
+      - ANABENCH2CODE
+      - ANABENCH2
+      - SKUGroup
+      - SYS_SOURCE_DATE
+    file_format:
+      field_delimiter: ';'
+      skip_header: 1
+      field_optionally_enclosed_by: '"'

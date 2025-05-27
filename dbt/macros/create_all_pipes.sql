@@ -17,10 +17,10 @@
         {% set file_columns = pipe.columns %}
         {% set all_columns = file_columns + ['FILE_NAME', 'LOAD_TIME'] %}
 
-        {# Génère les noms pour COPY INTO (...) #}
+        {# COPY INTO (col1, col2, ..., FILE_NAME, LOAD_TIME) #}
         {% set copy_into_columns = '(' ~ all_columns | join(', ') ~ ')' %}
 
-        {# Génère les expressions SELECT : t.$1, t.$2, ... + metadata + current_timestamp() #}
+        {# SELECT t.$1, t.$2, ..., metadata$filename, current_timestamp() #}
         {% set select_parts = [] %}
         {% for i in range(1, file_columns | length + 1) %}
             {% do select_parts.append('t.$' ~ i) %}
@@ -28,6 +28,17 @@
         {% do select_parts.append('metadata$filename') %}
         {% do select_parts.append('current_timestamp()') %}
         {% set select_expr = select_parts | join(', ') %}
+
+        {# File format config #}
+        {% set fmt = pipe.get('file_format', {}) %}
+        {% set file_format_config %}
+            file_format = (
+              type = csv
+              {% if fmt.field_delimiter is defined %} field_delimiter = '{{ fmt.field_delimiter }}' {% endif %}
+              {% if fmt.skip_header is defined %} skip_header = {{ fmt.skip_header }} {% endif %}
+              {% if fmt.field_optionally_enclosed_by is defined %} field_optionally_enclosed_by = '{{ fmt.field_optionally_enclosed_by }}' {% endif %}
+            )
+        {% endset %}
 
         {% set sql %}
             create or replace pipe {{ qualified_pipe_name }} as
@@ -37,7 +48,7 @@
               from @{{ qualified_stage }} t
             )
             pattern = '{{ pipe.pattern }}'
-            file_format = (type = csv field_optionally_enclosed_by='"' skip_header=1);
+            {{ file_format_config }};
         {% endset %}
 
         {% do log("Exécution SQL : " ~ sql, info=True) %}
