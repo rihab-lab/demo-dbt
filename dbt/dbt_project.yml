@@ -33,7 +33,11 @@ vars:
       table: PRC_CAMPAIGN_RAW
       pattern: ".*PRC_CAMPAIGN_.*\\.csv"
       columns:
-        - CampaignId
+        - HouseKey
+        - CampaignCode
         - CampaignName
-        - SKUGroup
+        - CampaignDescription
+        - HistoricalSellInFirstMonth
+        - HistoricalSellInLastMonth
+        - CampaignDate
         - SYS_SOURCE_DATE
