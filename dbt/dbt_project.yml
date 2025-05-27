@@ -18,12 +18,11 @@ vars:
   pipe_configs:
     - name: pipe_prc_benchmark
       stage: EXTERNAL_AZURE_STAGE
-      table: RAW_LAYER.PRC_BENCHMARK_RAW
+      table: PRC_BENCHMARK_RAW
       pattern: ".*PRC_BENCHMARK_.*\\.csv"
 
     - name: pipe_prc_campaign
       stage: EXTERNAL_AZURE_STAGE
-      table: RAW_LAYER.PRC_CAMPAIGN_RAW
+      table: PRC_CAMPAIGN_RAW
       pattern: ".*PRC_CAMPAIGN_.*\\.csv"
-
 
