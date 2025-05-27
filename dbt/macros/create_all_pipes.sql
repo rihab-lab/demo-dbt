@@ -39,11 +39,12 @@
 
         {# Vérifie si le pipe existe déjà #}
        {% set check_pipe_query %}
-       select count(*) from information_schema.pipes
-       where PIPE_NAME = upper('{{ pipe.name }}')
-      and TABLE_SCHEMA = upper('{{ schema }}')
-      and TABLE_CATALOG = upper('{{ database }}')
+    select count(*) from {{ database }}.information_schema.pipes
+    where PIPE_NAME = upper('{{ pipe.name }}')
+      and PIPE_SCHEMA = '{{ schema }}'
+      and PIPE_CATALOG = '{{ database }}'
 {% endset %}
+
         {% set check_result = run_query(check_pipe_query) %}
         {% set pipe_exists = check_result.columns[0].values()[0] %}
 
