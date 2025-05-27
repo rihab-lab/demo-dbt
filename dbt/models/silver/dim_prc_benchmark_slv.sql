@@ -14,11 +14,12 @@ with source as (
     from {{ source('BRONZE_LAYER', 'PRC_BENCHMARK_BRZ_STREAM') }}
 ),
 
+
 deduplicated as (
     select *,
            row_number() over (
-               partition by to_numeric(hash(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2, 'N/A')))
-               order by try_to_timestamp(SYS_SOURCE_DATE) desc nulls last, current_timestamp() desc
+               partition by HOUSEKEY, CAMPAIGNCODE
+               order by LOAD_TIME desc
            ) as row_num
     from source
 )

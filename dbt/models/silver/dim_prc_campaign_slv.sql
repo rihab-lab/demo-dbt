@@ -18,7 +18,7 @@ deduplicated as (
     select *,
            row_number() over (
                partition by HOUSEKEY, CAMPAIGNCODE
-               order by CREATE_DATE desc
+               order by LOAD_TIME desc
            ) as row_num
     from source
 )
