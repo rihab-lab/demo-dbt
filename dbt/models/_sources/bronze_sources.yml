@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: BRONZE_LAYER
+    database: TEST_POC_VISEO_DB
+    schema: BRONZE_LAYER
+    tables:
+      - name: PRC_CAMPAIGN_BRZ_STREAM
+      - name: PRC_BENCHMARK_BRZ_STREAM
