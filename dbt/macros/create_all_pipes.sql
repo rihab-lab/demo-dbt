@@ -1,8 +1,7 @@
 {% macro create_all_pipes_from_config() %}
-    {% set config_path = 'pipes/pipes.yml' %}
-    {% set pipe_config = fromyaml(load_file(config_path)) %}
+    {% set pipes = var('pipe_configs', []) %}
 
-    {% for pipe in pipe_config.pipes %}
+    {% for pipe in pipes %}
         create or replace pipe {{ pipe.name }} as
         copy into {{ pipe.table }}
         from @{{ pipe.stage }}
