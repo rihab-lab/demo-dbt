@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: RAW_LAYER
+    database: TEST_POC_VISEO_DB
+    schema: RAW_LAYER
+    tables:
+      - name: PRC_BENCHMARK_RAW
+      - name: PRC_CAMPAIGN_RAW
