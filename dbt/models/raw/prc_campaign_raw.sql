@@ -1,8 +1,10 @@
 {{ config(
-    materialized = "table",
-    database     = "TEST_POC_VISEO_DB",
-    schema       = "RAW_LAYER"
+  materialized = "incremental",
+  unique_key = "FILE_NAME",
+  schema = "RAW_LAYER",
+  database = "TEST_POC_VISEO_DB"
 ) }}
+
 
 -- CTAS vide pour ne créer que la structure
 select
@@ -17,3 +19,8 @@ select
   ,cast(null as varchar(16777216))   as FILE_NAME
   ,cast(current_timestamp() as timestamp_ntz(9)) as LOAD_TIME
 where false
+
+
+{% if is_incremental() %}
+  and 1=0 
+{% endif %}
