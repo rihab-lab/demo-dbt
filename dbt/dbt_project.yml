@@ -13,6 +13,8 @@ models:
       +materialized: table
 
 vars:
+  SF_DATABASE: TEST_POC_VISEO_DB
+  SF_SCHEMA: RAW_LAYER
   pipe_configs:
     - name: pipe_prc_benchmark
       stage: EXTERNAL_AZURE_STAGE

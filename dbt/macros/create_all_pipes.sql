@@ -1,13 +1,16 @@
 {% macro create_all_pipes_from_config() %}
     {% set pipes = var('pipe_configs', []) %}
+    {% set database = var('SF_DATABASE') %}
+    {% set schema = var('SF_SCHEMA') %}
+
+    {% do log("Database utilisé : " ~ database, info=True) %}
+    {% do log("Schéma utilisé   : " ~ schema, info=True) %}
     {% do log("Nombre de pipes à créer : " ~ pipes | length, info=True) %}
 
     {% set messages = [] %}
 
     {% for pipe in pipes %}
-        {% do log("Database cible = " ~ target.database, info=True) %}
-        {% do log("Schéma cible   = " ~ target.schema, info=True) %}
-        {% set qualified_pipe_name = target.database ~ '.' ~ target.schema ~ '.' ~ pipe.name %}
+        {% set qualified_pipe_name = database ~ '.' ~ schema ~ '.' ~ pipe.name %}
         {% set sql %}
             create or replace pipe {{ qualified_pipe_name }} as
             copy into {{ pipe.table }}
