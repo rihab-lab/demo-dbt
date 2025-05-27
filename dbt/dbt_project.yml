@@ -7,6 +7,7 @@ models:
   demo_dbt:
     raw:
       +materialized: table
+      +full_refresh: false
     bronze:
       +materialized: table
     silver:
@@ -49,3 +50,4 @@ vars:
       field_delimiter: ';'
       skip_header: 1
       field_optionally_enclosed_by: '"'
+
