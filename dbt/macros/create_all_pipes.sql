@@ -14,7 +14,6 @@
         {% set qualified_table = database ~ '.' ~ schema ~ '.' ~ pipe.table %}
         {% set qualified_stage = database ~ '.' ~ schema ~ '.' ~ pipe.stage %}
         {% set sql %}
-        {% do log("pipename: " ~ qualified_pipe_name, info=True) %}
             create or replace pipe {{ qualified_pipe_name }} as
             copy into {{ qualified_table }}
             from @{{ qualified_stage }}
