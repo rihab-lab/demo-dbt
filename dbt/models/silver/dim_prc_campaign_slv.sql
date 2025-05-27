@@ -1,24 +1,39 @@
--- dbt/models/silver/dim_prc_campaign_slv.sql
-
--- On ajoute la clé primaire en post-hook (métadonnée Snowflake)
 {{ config(
-    materialized = "table",
-    schema       = "SILVER_LAYER",
-    post_hook    = [
-      "alter table {{ this }} add primary key (PricingCampaignPrcIntKey)"
+    materialized = "incremental",
+    schema = "SILVER_LAYER",
+    unique_key = "PRICINGCAMPAIGNPRCINTKEY",
+    incremental_strategy = "merge",
+    on_schema_change = "append_new_columns",
+    post_hook = [
+      "alter table {{ this }} add primary key (PRICINGCAMPAIGNPRCINTKEY)"
     ]
 ) }}
 
+with source as (
+    select *
+    from {{ source('BRONZE_LAYER', 'PRC_CAMPAIGN_BRZ_STREAM') }}
+),
+
+deduplicated as (
+    select *,
+           row_number() over (
+               partition by HOUSEKEY, CAMPAIGNCODE
+               order by CREATE_DATE desc
+           ) as row_num
+    from source
+)
+
 select
-  cast(null as number)               as PricingCampaignPrcIntKey,  -- NOT NULL
-  cast(null as varchar(16777216))    as PricingCampaignPrcKey,     -- NOT NULL
-  cast(null as varchar(16777216))    as HOUSEKEY,                   -- NOT NULL
-  cast(null as varchar(16777216))    as CAMPAIGNCODE,               -- NOT NULL
-  cast(null as varchar(16777216))    as CAMPAIGNNAME,
-  cast(null as varchar(16777216))    as CAMPAIGNDESCRIPTION,
-  cast(null as varchar(16777216))    as HISTORICALSELLINFIRSTMONTH,
-  cast(null as varchar(16777216))    as HISTORICALSELLINLASTMONTH,
-  cast(null as varchar(16777216))    as CAMPAIGNDATE,
-  cast(null as timestamp_ltz)        as SYS_SOURCE_DATE,
-  cast(current_timestamp() as timestamp_ltz) as SYS_DATE_CREATE
-where false
+    hash(HOUSEKEY || '_' || CAMPAIGNCODE) as PRICINGCAMPAIGNPRCINTKEY,
+    coalesce(CAMPAIGNCODE, 'N/A') || '_' || coalesce(CAMPAIGNNAME, 'N/A') as PRICINGCAMPAIGNPRCKEY,
+    HOUSEKEY,
+    CAMPAIGNCODE,
+    CAMPAIGNNAME,
+    CAMPAIGNDESCRIPTION,
+    HISTORICALSELLINFIRSTMONTH,
+    HISTORICALSELLINLASTMONTH,
+    CAMPAIGNDATE,
+    cast(try_to_timestamp_tz(SYS_SOURCE_DATE, 'YYYY-MM-DD HH24:MI:SS.FF3 TZD') as timestamp_ltz) as SYS_SOURCE_DATE,
+    current_timestamp() as SYS_DATE_CREATE
+from deduplicated
+where row_num = 1

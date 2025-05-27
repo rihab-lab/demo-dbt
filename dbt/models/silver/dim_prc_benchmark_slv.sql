@@ -1,20 +1,35 @@
--- dbt/models/silver/dim_prc_benchmark_slv.sql
-
--- On ajoute la clé primaire en post-hook (métadonnée Snowflake)
 {{ config(
-    materialized = "table",
-    schema       = "SILVER_LAYER",
-    post_hook    = [
+    materialized = "incremental",
+    schema = "SILVER_LAYER",
+    unique_key = "PRICINGBENCHMARKPRCINTKEY",
+    incremental_strategy = "merge",
+    on_schema_change = "append_new_columns",
+    post_hook = [
       "alter table {{ this }} add primary key (PRICINGBENCHMARKPRCINTKEY)"
     ]
 ) }}
 
+with source as (
+    select *
+    from {{ source('BRONZE_LAYER', 'PRC_BENCHMARK_BRZ_STREAM') }}
+),
+
+deduplicated as (
+    select *,
+           row_number() over (
+               partition by to_numeric(hash(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2, 'N/A')))
+               order by try_to_timestamp(SYS_SOURCE_DATE) desc nulls last, current_timestamp() desc
+           ) as row_num
+    from source
+)
+
 select
-  cast(null as number)               as PRICINGBENCHMARKPRCINTKEY,  -- NOT NULL
-  cast(null as varchar)              as PRICINGBENCHMARKPRCKEY,     -- NOT NULL
-  cast(null as varchar)              as APUKCODE,                   -- NOT NULL
-  cast(null as varchar)              as ANABENCH2,                  -- NOT NULL
-  cast(null as varchar)              as SKUGROUP,
-  cast(null as varchar)              as SYS_SOURCE_DATE,
-  cast(current_timestamp() as timestamp_ltz(9)) as SYS_DATE_CREATE  -- NOT NULL
-where false
+    to_numeric(hash(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2, 'N/A'))) as PRICINGBENCHMARKPRCINTKEY,
+    replace(coalesce(APUKCODE, 'N/A') || '_' || coalesce(ANABENCH2, 'N/A'), ' ', '_') as PRICINGBENCHMARKPRCKEY,
+    APUKCODE,
+    ANABENCH2,
+    SKUGROUP,
+    SYS_SOURCE_DATE,
+    current_timestamp() as SYS_DATE_CREATE
+from deduplicated
+where row_num = 1
