@@ -15,12 +15,12 @@ models:
 vars:
   pipe_configs:
     - name: pipe_prc_benchmark
-      stage: my_stage
+      stage: EXTERNAL_AZURE_STAGE
       table: RAW_LAYER.PRC_BENCHMARK_RAW
       pattern: ".*PRC_BENCHMARK_.*\\.csv"
 
     - name: pipe_prc_campaign
-      stage: my_stage
+      stage: EXTERNAL_AZURE_STAGE
       table: RAW_LAYER.PRC_CAMPAIGN_RAW
       pattern: ".*PRC_CAMPAIGN_.*\\.csv"
 
