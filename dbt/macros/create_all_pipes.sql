@@ -11,9 +11,10 @@
 
     {% for pipe in pipes %}
         {% set qualified_pipe_name = database ~ '.' ~ schema ~ '.' ~ pipe.name %}
+        {% set full_table_name = database ~ '.' ~ pipe.table %}
         {% set sql %}
             create or replace pipe {{ qualified_pipe_name }} as
-            copy into {{ pipe.table }}
+            copy into {{ full_table_name }}
             from @{{ pipe.stage }}
             pattern = '{{ pipe.pattern }}'
             file_format = (type = csv field_optionally_enclosed_by='"' skip_header=1);
