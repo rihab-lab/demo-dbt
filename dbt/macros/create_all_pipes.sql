@@ -5,8 +5,9 @@
     {% set messages = [] %}
 
     {% for pipe in pipes %}
+        {% set qualified_pipe_name = target.database ~ '.' ~ target.schema ~ '.' ~ pipe.name %}
         {% set sql %}
-            create or replace pipe {{ pipe.name }} as
+            create or replace pipe {{ qualified_pipe_name }} as
             copy into {{ pipe.table }}
             from @{{ pipe.stage }}
             pattern = '{{ pipe.pattern }}'
@@ -15,7 +16,7 @@
 
         {% do log("Exécution SQL : " ~ sql, info=True) %}
         {% do run_query(sql) %}
-        {% do messages.append("PIPE " ~ pipe.name ~ " créé") %}
+        {% do messages.append("PIPE " ~ qualified_pipe_name ~ " créé") %}
     {% endfor %}
 
     {% do return(messages) %}
