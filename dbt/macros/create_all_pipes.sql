@@ -5,6 +5,8 @@
     {% set messages = [] %}
 
     {% for pipe in pipes %}
+        {% do log("Database cible = " ~ target.database, info=True) %}
+        {% do log("Schéma cible   = " ~ target.schema, info=True) %}
         {% set qualified_pipe_name = target.database ~ '.' ~ target.schema ~ '.' ~ pipe.name %}
         {% set sql %}
             create or replace pipe {{ qualified_pipe_name }} as
