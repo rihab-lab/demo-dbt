@@ -15,14 +15,25 @@ models:
 vars:
   SF_DATABASE: TEST_POC_VISEO_DB
   SF_SCHEMA: RAW_LAYER
+
   pipe_configs:
     - name: pipe_prc_benchmark
       stage: EXTERNAL_AZURE_STAGE
       table: PRC_BENCHMARK_RAW
       pattern: ".*PRC_BENCHMARK_.*\\.csv"
+      columns:
+        - APUKCODE
+        - ANABENCH2CODE
+        - ANABENCH2
+        - SKUGroup
+        - SYS_SOURCE_DATE
 
     - name: pipe_prc_campaign
       stage: EXTERNAL_AZURE_STAGE
       table: PRC_CAMPAIGN_RAW
       pattern: ".*PRC_CAMPAIGN_.*\\.csv"
-
+      columns:
+        - CampaignId
+        - CampaignName
+        - SKUGroup
+        - SYS_SOURCE_DATE
