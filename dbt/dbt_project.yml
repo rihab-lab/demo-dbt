@@ -12,5 +12,4 @@ models:
     silver:
       +materialized: table
 
-on-run-start:
-  - "{{ create_all_pipes_from_config() }}"
+
