@@ -27,11 +27,11 @@
         append_only = false;
       {% endset %}
 
-      {% do log("✅ Création du stream : " ~ stream_name, info=True) %}
+      {% do log("réation du stream : " ~ stream_name, info=True) %}
       {% do run_query(sql) %}
-      {% do results.append("✅ Stream créé : " ~ stream_name) %}
+      {% do results.append("Stream créé : " ~ stream_name) %}
     {% else %}
-      {% do log("ℹ️ Stream déjà existant : " ~ stream_name ~ ", ignoré", info=True) %}
+      {% do log("ℹStream déjà existant : " ~ stream_name ~ ", ignoré", info=True) %}
     {% endif %}
   {% endfor %}
 

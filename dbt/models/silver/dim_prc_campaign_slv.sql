@@ -5,7 +5,7 @@
     incremental_strategy = "merge",
     on_schema_change = "append_new_columns",
     post_hook = [
-      "alter table {{ this }} add primary key (PRICINGCAMPAIGNPRCINTKEY)"
+        "{{ add_primary_key_if_not_exists(this, 'PRICINGCAMPAIGNPRCINTKEY') }}"
     ]
 ) }}
 
