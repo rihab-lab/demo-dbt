@@ -1,17 +1,26 @@
-{% macro add_primary_key_if_not_exists(relation, column) %}
-    {% set relation_id = relation.database ~ '.' ~ relation.schema ~ '.' ~ relation.identifier %}
-    {% set check_pk_query %}
-        select count(*) as count
-        from information_schema.table_constraints
-        where constraint_type = 'PRIMARY KEY'
-        and table_name = '{{ relation.identifier | upper }}'
-        and table_schema = '{{ relation.schema | upper }}'
-    {% endset %}
+-- macros/add_primary_key_if_not_exists.sql
 
-    {% set result = run_query(check_pk_query) %}
-    {% if result.columns[0].values()[0] == 0 %}
-        alter table {{ relation_id }} add primary key ({{ column }})
-    {% else %}
-        -- primary key already exists, skipping
-    {% endif %}
+{% macro add_primary_key_if_not_exists(model, column_name) %}
+  {% if not execute %}
+    {% do return(None) %}
+  {% endif %}
+
+  {% set database = model.database %}
+  {% set schema = model.schema %}
+  {% set table = model.table %}
+
+  {% set check_query %}
+      SELECT count(*) 
+      FROM information_schema.table_constraints 
+      WHERE table_schema = '{{ schema }}' 
+        AND table_name = '{{ table }}'
+        AND constraint_type = 'PRIMARY KEY'
+  {% endset %}
+
+  {% set result = run_query(check_query) %}
+  {% if result and result.columns[0].name == 'COUNT' and result.rows[0][0] == 0 %}
+    alter table {{ model }} add primary key ({{ column_name }});
+  {% else %}
+    -- clé déjà présente
+  {% endif %}
 {% endmacro %}

@@ -34,4 +34,7 @@ from deduplicated
 where row_num = 1
 
 -- 👇 Exécution de la macro à la fin du modèle
-{{ add_primary_key_if_not_exists(this, 'PRICINGBENCHMARKPRCINTKEY') }}
+
+{% if execute and this is not none %}
+ {{ add_primary_key_if_not_exists(this, 'PRICINGBENCHMARKPRCINTKEY') }}
+{% endif %}
