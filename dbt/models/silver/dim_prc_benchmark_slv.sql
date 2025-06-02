@@ -3,10 +3,7 @@
     schema = "SILVER_LAYER",
     unique_key = "PRICINGBENCHMARKPRCINTKEY",
     incremental_strategy = "merge",
-    on_schema_change = "append_new_columns",
-    post_hook = [
-        "{{ add_primary_key_if_not_exists(this, 'PRICINGBENCHMARKPRCINTKEY') }}"
-    ]
+    on_schema_change = "append_new_columns"
 ) }}
 
 with source as (
@@ -16,6 +13,7 @@ with source as (
 
 deduplicated as (
     select *,
+
         row_number() over (
             partition by APUKCODE, ANABENCH2CODE
             order by LOAD_TIME desc
@@ -34,3 +32,6 @@ select
     current_timestamp() as SYS_DATE_CREATE
 from deduplicated
 where row_num = 1
+
+-- 👇 Exécution de la macro à la fin du modèle
+{{ add_primary_key_if_not_exists(this, 'PRICINGBENCHMARKPRCINTKEY') }}

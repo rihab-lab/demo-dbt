@@ -1,23 +1,17 @@
-{% macro add_primary_key_if_not_exists(model, key_column) %}
-    {% set database = model.database %}
-    {% set schema = model.schema %}
-    {% set table = model.alias %}
-
-    {% set sql %}
-        select count(*) as key_exists
+{% macro add_primary_key_if_not_exists(relation, column) %}
+    {% set relation_id = relation.database ~ '.' ~ relation.schema ~ '.' ~ relation.identifier %}
+    {% set check_pk_query %}
+        select count(*) as count
         from information_schema.table_constraints
         where constraint_type = 'PRIMARY KEY'
-        and table_name = upper('{{ table }}')
-        and table_schema = upper('{{ schema }}')
+        and table_name = '{{ relation.identifier | upper }}'
+        and table_schema = '{{ relation.schema | upper }}'
     {% endset %}
 
-    {% set results = run_query(sql) %}
-    {% if execute and results %}
-        {% set key_exists = results.columns[0].values()[0] %}
-        {% if key_exists == 0 %}
-            alter table {{ model }} add primary key ({{ key_column }});
-        {% else %}
-            -- primary key already exists
-        {% endif %}
+    {% set result = run_query(check_pk_query) %}
+    {% if result.columns[0].values()[0] == 0 %}
+        alter table {{ relation_id }} add primary key ({{ column }})
+    {% else %}
+        -- primary key already exists, skipping
     {% endif %}
 {% endmacro %}

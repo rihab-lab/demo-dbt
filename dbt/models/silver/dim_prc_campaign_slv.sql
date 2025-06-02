@@ -1,4 +1,4 @@
-{{ config(
+/*{{ config(
     materialized = "incremental",
     schema = "SILVER_LAYER",
     unique_key = "PRICINGCAMPAIGNPRCINTKEY",
@@ -7,6 +7,7 @@
     post_hook = [
         "{{ add_primary_key_if_not_exists(this, 'PRICINGCAMPAIGNPRCINTKEY') }}"
     ]
+    
 ) }}
 
 with source as (
@@ -37,3 +38,4 @@ select
     current_timestamp() as SYS_DATE_CREATE
 from deduplicated
 where row_num = 1
+*/
