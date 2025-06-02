@@ -1,4 +1,4 @@
-{{ config(
+/*{{ config(
     materialized = "incremental",
     schema = "SILVER_LAYER",
     unique_key = "PRICINGCAMPAIGNPRCINTKEY",
@@ -37,4 +37,4 @@ select
 from deduplicated
 where row_num = 1
 
-{{ add_primary_key_if_not_exists(this, 'PRICINGCAMPAIGNPRCINTKEY') }}
+{{ add_primary_key_if_not_exists(this, 'PRICINGCAMPAIGNPRCINTKEY') }}*/
