@@ -1,11 +1,9 @@
-/*{{ config(
+{{ config(
     materialized = "incremental",
     schema = "SILVER_LAYER",
     unique_key = "PRICINGCAMPAIGNPRCINTKEY",
     incremental_strategy = "merge",
-    on_schema_change = "append_new_columns",
-   
-    
+    on_schema_change = "append_new_columns"
 ) }}
 
 with source as (
@@ -37,4 +35,6 @@ select
 from deduplicated
 where row_num = 1
 
-{{ add_primary_key_if_not_exists(this, 'PRICINGCAMPAIGNPRCINTKEY') }}*/
+{% if this is not none %}
+  {{ add_primary_key_if_not_exists(this, 'PRICINGCAMPAIGNPRCINTKEY') }}
+{% endif %}
