@@ -11,12 +11,10 @@
     {% set show_query %}
       show streams in schema {{ database }}.{{ schema }}
     {% endset %}
-
     {% set show_result = run_query(show_query) %}
 
     {% for row in show_result.rows %}
-      {% do log("Stream détecté: " ~ row, info=True) %}
-      {% if row[1] | upper == stream_name %}
+      {% if row[1] is not none and row[1] | upper == stream_name %}
         {% set stream_exists = true %}
       {% endif %}
     {% endfor %}
@@ -27,6 +25,7 @@
         on table {{ database }}.{{ schema }}.{{ table }}
         append_only = false;
       {% endset %}
+
       {% do log("✅ Création du stream : " ~ stream_name, info=True) %}
       {% do run_query(sql) %}
       {% do results.append("Stream créé : " ~ stream_name) %}
