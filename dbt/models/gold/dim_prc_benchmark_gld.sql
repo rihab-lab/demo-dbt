@@ -1,23 +1,46 @@
--- dbt/models/gold/dim_prc_benchmark_gld.sql
+{{ 
+  config(
+    materialized         = "incremental",
+    schema               = "GOLD_LAYER",
+    unique_key           = "PrcPcsBenchmarkIntKey",
+    incremental_strategy = "merge",
+    on_schema_change     = "append_new_columns"
+  ) 
+}}
 
--- On ajoute la PK en post-hook (métadonnée Snowflake)
-{{ config(
-    materialized = "table",
-    schema       = "GOLD_LAYER",
-    post_hook    = [
-      "alter table {{ this }} add primary key (PrcPcsBenchmarkIntKey)"
-    ]
-) }}
+
+
+with source as (
+  select
+    PRICINGBENCHMARKPRCINTKEY              as PrcPcsBenchmarkIntKey,
+    0                                       as PrcPcsGenericProductIntKey,
+    APUKCODE,
+    current_timestamp()                     as SYS_DATE_CREATE,
+    current_timestamp()                     as SYS_DATE_UPDATE,
+    row_number() over (
+      partition by PRICINGBENCHMARKPRCINTKEY
+      order by SYS_DATE_UPDATE desc
+    )                                       as row_num
+  from {{ source('SILVER_LAYER', 'DIM_PRC_BENCHMARK_SLV_STREAM') }}
+  where PRICINGBENCHMARKPRCINTKEY is not null
+    and APUKCODE                  is not null
+),
+
+deduplicated as (
+  select *
+  from source
+  where row_num = 1
+)
 
 select
-  cast(null as number)               as PrcPcsBenchmarkIntKey,       
-  cast(null as number)               as PrcPcsGenericProductIntKey,  -- NOT NULL
-  cast(null as varchar)              as APUKCode,                    -- NOT NULL
-  cast(null as varchar)              as SKUGroup,
-  cast(null as varchar)              as Anabench2,
-  cast(null as varchar)              as Anabench1,
-  cast(null as varchar)              as HouseCode,
-  cast(null as timestamp_ltz)        as SYS_SOURCE_DATE,
-  cast(current_timestamp() as timestamp_ltz) as SYS_DATE_CREATE,
-  cast(current_timestamp() as timestamp_ltz) as SYS_DATE_UPDATE  -- NOT NULL
-where false
+  PrcPcsBenchmarkIntKey,
+  PrcPcsGenericProductIntKey,
+  APUKCODE,
+  SYS_DATE_CREATE,
+  SYS_DATE_UPDATE
+from deduplicated
+
+
+{% if execute and this is not none %}
+  {% do add_primary_key_if_not_exists(this, 'PrcPcsBenchmarkIntKey') %}
+{% endif %}

@@ -1,23 +1,46 @@
--- dbt/models/gold/dim_prc_campaign_gld.sql
+{{ 
+  config(
+    materialized         = "incremental",
+    schema               = "GOLD_LAYER",
+    unique_key           = "PrcPcsCampaignIntKey",
+    incremental_strategy = "merge",
+    on_schema_change     = "append_new_columns"
+  ) 
+}}
 
--- On ajoute la clé primaire en post-hook (métadonnée Snowflake)
-{{ config(
-    materialized = "table",
-    schema       = "GOLD_LAYER",
-    post_hook    = [
-      "alter table {{ this }} add primary key (PrcPcsCampaignIntKey)"
-    ]
-) }}
+with source as (
+  select
+    PricingCampaignPrcIntKey    as PrcPcsCampaignIntKey,
+    HouseKey,
+    CampaignCode,
+    current_timestamp()         as SYS_DATE_CREATE,
+    current_timestamp()         as SYS_DATE_UPDATE,
+    row_number() over (
+      partition by PricingCampaignPrcIntKey
+      order by SYS_DATE_UPDATE desc
+    ) as row_num
+  from {{ source('SILVER_LAYER', 'DIM_PRC_CAMPAIGN_SLV_STREAM') }}
+  where
+    PricingCampaignPrcIntKey is not null
+    and HouseKey           is not null
+    and CampaignCode       is not null
+),
+
+deduplicated as (
+  select *
+  from source
+  where row_num = 1
+)
 
 select
-  cast(null  as number)      as PrcPcsCampaignIntKey,       -- PK NOT NULL
-  cast(null  as varchar)     as HouseKey,                   -- NOT NULL
-  cast(null  as varchar)     as CampaignCode,               -- NOT NULL
-  cast(null  as varchar)     as CampaignName,
-  cast(null  as varchar)     as CampaignDescription,
-  cast(null  as varchar)     as HistoricalSellInFirstMonth,
-  cast(null  as varchar)     as HistoricalSellInLastMonth,
-  cast(null  as date)        as CampaignDate,
-  cast(current_timestamp() as timestamp_ltz) as SYS_DATE_CREATE,  -- NOT NULL
-  cast(current_timestamp() as timestamp_ltz) as SYS_DATE_UPDATE   -- NOT NULL
-where false
+  PrcPcsCampaignIntKey,
+  HouseKey,
+  CampaignCode,
+  SYS_DATE_CREATE,
+  SYS_DATE_UPDATE
+from deduplicated
+
+
+{% if execute and this is not none %}
+  {% do add_primary_key_if_not_exists(this, 'PrcPcsCampaignIntKey') %}
+{% endif %}
