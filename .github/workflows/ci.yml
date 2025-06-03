@@ -63,17 +63,22 @@ jobs:
       - name: Debug dbt config
         working-directory: dbt
         run: dbt debug
+      
+      - name: Create all Streams from Bronze
+        working-directory: dbt
+        run: dbt run-operation create_streams_from_bronze
 
       - name: Run all models
         working-directory: dbt
         run: |
           dbt deps
           dbt run --models raw.* bronze.* silver.* gold.* --debug
-      
+
       - name: Create all Snowpipes from config
         working-directory: dbt
         run: |
           dbt run-operation create_all_pipes_from_config
-      - name: Create all Streams from Bronze
-        working-directory: dbt
-        run: dbt run-operation create_streams_from_bronze
+      
+     
+      
+
