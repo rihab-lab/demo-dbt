@@ -31,7 +31,7 @@
       {% do run_query(sql) %}
       {% do results.append("Stream créé : " ~ stream_name) %}
     {% else %}
-      {% do log("ℹStream déjà existant : " ~ stream_name ~ ", ignoré", info=True) %}
+      {% do log("Stream déjà existant : " ~ stream_name ~ ", ignoré", info=True) %}
     {% endif %}
   {% endfor %}
 

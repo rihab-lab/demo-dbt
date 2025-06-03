@@ -1,4 +1,4 @@
-{{ config(
+/*{{ config(
     materialized = "incremental",
     schema = "SILVER_LAYER",
     unique_key = "PRICINGBENCHMARKPRCINTKEY",
@@ -37,4 +37,4 @@ where row_num = 1
 
 {% if execute and this is not none %}
  {{ add_primary_key_if_not_exists(this, 'PRICINGBENCHMARKPRCINTKEY') }}
-{% endif %}
+{% endif %}*/
