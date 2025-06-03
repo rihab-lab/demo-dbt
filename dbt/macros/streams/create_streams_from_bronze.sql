@@ -1,39 +1,30 @@
 {% macro create_streams_from_bronze() %}
-  {% set bronze_tables = [
-    'PRC_BENCHMARK_BRZ',
-    'PRC_CAMPAIGN_BRZ'
-  ] %}
-
-  {% set schema = 'BRONZE_LAYER' %}
+  {% set bronze_tables = ['PRC_BENCHMARK_BRZ','PRC_CAMPAIGN_BRZ'] %}
   {% set database = var('SF_DATABASE') %}
-  {% set results = [] %}
+  {% set schema   = 'BRONZE_LAYER' %}
+  {% set results  = [] %}
+
+  {# 1. Récupère une seule fois la liste des streams existants #}
+  {% set show_q = "SHOW STREAMS IN SCHEMA " ~ database ~ "." ~ schema %}
+  {% set show_result = run_query(show_q) %}
+  {% set existing_streams = show_result.columns[0].values() %}
 
   {% for table in bronze_tables %}
     {% set stream_name = table ~ '_STREAM' %}
-
-    {# Liste tous les streams dans le schéma concerné #}
-    {% set show_streams_query %}
-      show streams in schema {{ database }}.{{ schema }}
-    {% endset %}
-
-    {% set show_result = run_query(show_streams_query) %}
-    {% set stream_names = show_result.columns[0].values() %}
-    {% set exists = stream_name in stream_names %}
-
-    {% if not exists %}
-      {% set sql %}
-        create or replace stream {{ database }}.{{ schema }}.{{ stream_name }}
-        on table {{ database }}.{{ schema }}.{{ table }}
-        append_only = false;
+    {% if stream_name not in existing_streams %}
+      {% set create_sql %}
+        CREATE OR REPLACE STREAM {{ database }}.{{ schema }}.{{ stream_name }}
+        ON TABLE {{ database }}.{{ schema }}.{{ table }}
+        APPEND_ONLY = FALSE;
       {% endset %}
 
-      {% do log("création du stream : " ~ stream_name, info=True) %}
-      {% do run_query(sql) %}
+      {% do log("Création du stream : " ~ stream_name, info=True) %}
+      {% do run_query(create_sql) %}
       {% do results.append("Stream créé : " ~ stream_name) %}
     {% else %}
-      {% do log("Stream déjà existant : " ~ stream_name ~ ", ignoré", info=True) %}
+      {% do log("Stream déjà existant, skip : " ~ stream_name, info=True) %}
     {% endif %}
   {% endfor %}
 
   {% do return(results) %}
-{% endmacro %} 
+{% endmacro %}
