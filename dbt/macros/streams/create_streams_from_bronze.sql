@@ -14,22 +14,21 @@
 
     {% set show_result = run_query(show_query) %}
 
-    {# LOG pour déboguer #}
     {% for row in show_result.rows %}
       {% do log("Stream détecté: " ~ row, info=True) %}
-      {% if row['name'] | upper == stream_name %}
+      {% if row[1] | upper == stream_name %}
         {% set stream_exists = true %}
       {% endif %}
     {% endfor %}
 
     {% if not stream_exists %}
-      {% set create_sql %}
+      {% set sql %}
         create or replace stream {{ database }}.{{ schema }}.{{ stream_name }}
         on table {{ database }}.{{ schema }}.{{ table }}
         append_only = false;
       {% endset %}
       {% do log("✅ Création du stream : " ~ stream_name, info=True) %}
-      {% do run_query(create_sql) %}
+      {% do run_query(sql) %}
       {% do results.append("Stream créé : " ~ stream_name) %}
     {% else %}
       {% do log("ℹ️ Stream déjà existant : " ~ stream_name ~ ", ignoré", info=True) %}
