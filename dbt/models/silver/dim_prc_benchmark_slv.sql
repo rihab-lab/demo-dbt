@@ -1,4 +1,4 @@
-/*{{ config(
+{{ config(
     materialized = "incremental",
     schema = "SILVER_LAYER",
     unique_key = "PRICINGBENCHMARKPRCINTKEY",
@@ -13,7 +13,6 @@ with source as (
 
 deduplicated as (
     select *,
-
         row_number() over (
             partition by APUKCODE, ANABENCH2CODE
             order by LOAD_TIME desc
@@ -33,8 +32,7 @@ select
 from deduplicated
 where row_num = 1
 
--- 👇 Exécution de la macro à la fin du modèle
-
+-- 👇 Exécution sécurisée de la macro en runtime uniquement
 {% if execute and this is not none %}
- {{ add_primary_key_if_not_exists(this, 'PRICINGBENCHMARKPRCINTKEY') }}
-{% endif %}*/
+  {% do add_primary_key_if_not_exists(this, 'PRICINGBENCHMARKPRCINTKEY') %}
+{% endif %}
