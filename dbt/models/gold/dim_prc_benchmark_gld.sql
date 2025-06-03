@@ -21,7 +21,7 @@ with source as (
       partition by PRICINGBENCHMARKPRCINTKEY
       order by SYS_DATE_UPDATE desc
     )                                       as row_num
-  from {{ source('SILVER_LAYER', 'DIM_PRC_BENCHMARK_SLV_STREAM') }}
+  from {{ source('SILVER_LAYER', 'dim_prc_benchmark_slv_stream') }}
   where PRICINGBENCHMARKPRCINTKEY is not null
     and APUKCODE                  is not null
 ),
