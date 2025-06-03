@@ -8,7 +8,7 @@
   {% set show_streams_sql = "SHOW STREAMS IN SCHEMA " ~ database ~ "." ~ schema %}
   {% set show_result      = run_query(show_streams_sql) %}
   {# Ici, on extrait la première colonne (STREAM_NAME) #}
-  {% set existing_streams = show_result.columns[0].values() %}
+  {% set existing_streams = show_result.columns[1].values() %}
 
   {# 2) Logguer pour voir ce que contient “existing_streams” #}
   {% do log("→ Liste des streams existants: " ~ existing_streams | join(", "), info=True) %}
