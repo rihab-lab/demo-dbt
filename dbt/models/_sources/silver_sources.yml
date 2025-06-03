@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: SILVER_LAYER
+    database: TEST_POC_VISEO_DB
+    schema: SILVER_LAYER
+    tables:
+      - name: DIM_PRC_BENCHMARK_SLV_STREAM
+      - name: DIM_PRC_CAMPAIGN_SLV_STREAM

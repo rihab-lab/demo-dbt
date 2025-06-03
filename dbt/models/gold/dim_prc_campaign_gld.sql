@@ -19,7 +19,7 @@ with source as (
       partition by PricingCampaignPrcIntKey
       order by SYS_DATE_UPDATE desc
     ) as row_num
-   from {{ source('SILVER_LAYER', 'dim_prc_campaign_slv_stream') }}
+   from {{ source('SILVER_LAYER', 'DIM_PRC_CAMPAIGN_SLV_STREAM') }}
   where
     PricingCampaignPrcIntKey is not null
     and HouseKey           is not null
