@@ -68,34 +68,17 @@ jobs:
         working-directory: dbt
         run: dbt run-operation create_streams_from_bronze
 
-      # ───────────────────────────────────────────────────────────────────────────
-      # 1) Run raw + bronze
-      # ───────────────────────────────────────────────────────────────────────────
-      - name: Run raw + bronze models
+      - name: Run all models
         working-directory: dbt
         run: |
           dbt deps
-          dbt run --models raw.* bronze.* --debug
-
-      # ───────────────────────────────────────────────────────────────────────────
-      # 2) Initial load Silver (full-refresh)
-      #    → lit la table BRONZE pour récupérer tout l’historique
-      # ───────────────────────────────────────────────────────────────────────────
-      - name: Initial load Silver
-        working-directory: dbt
-        run: |
-          dbt run --models silver.* --full-refresh --debug
-
-      # ───────────────────────────────────────────────────────────────────────────
-      # 3) Incremental load Silver et run gold
-      #    → lit le Stream pour ne prendre que les deltas, puis exécute gold.*
-      # ───────────────────────────────────────────────────────────────────────────
-      - name: Incremental load Silver + Run gold models
-        working-directory: dbt
-        run: |
-          dbt run --models silver.* --debug
-          dbt run --models gold.* --debug
+          dbt run --models raw.* bronze.* silver.* gold.* --debug
 
       - name: Create all Snowpipes from config
         working-directory: dbt
-        run: dbt run-operation create_all_pipes_from_config
+        run: |
+          dbt run-operation create_all_pipes_from_config
+      
+     
+      
+
