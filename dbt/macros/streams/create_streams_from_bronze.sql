@@ -13,8 +13,10 @@
     {% endset %}
 
     {% set show_result = run_query(show_query) %}
-    
+
+    {# LOG pour déboguer #}
     {% for row in show_result.rows %}
+      {% do log("Stream détecté: " ~ row, info=True) %}
       {% if row['name'] | upper == stream_name %}
         {% set stream_exists = true %}
       {% endif %}
@@ -26,7 +28,6 @@
         on table {{ database }}.{{ schema }}.{{ table }}
         append_only = false;
       {% endset %}
-
       {% do log("✅ Création du stream : " ~ stream_name, info=True) %}
       {% do run_query(create_sql) %}
       {% do results.append("Stream créé : " ~ stream_name) %}
