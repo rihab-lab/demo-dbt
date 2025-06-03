@@ -68,6 +68,10 @@ jobs:
         working-directory: dbt
         run: dbt run-operation create_streams_from_bronze
 
+      - name: Create all Streams from silver
+        working-directory: dbt
+        run: dbt run-operation create_streams_from_silver
+
       - name: Run all models
         working-directory: dbt
         run: |
