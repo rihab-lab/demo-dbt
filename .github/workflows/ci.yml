@@ -72,16 +72,29 @@ jobs:
         working-directory: dbt
         run: dbt run-operation create_streams_from_silver
 
-      - name: Run all models
+      - name: Run raw + bronze models
         working-directory: dbt
         run: |
           dbt deps
-          dbt run --models raw.* bronze.* silver.* gold.* --debug
+          dbt run --models raw.* bronze.* --debug
 
       - name: Create all Snowpipes from config
         working-directory: dbt
         run: |
           dbt run-operation create_all_pipes_from_config
+
+      - name: Incremental Load silver
+        working-directory: dbt
+        run: |
+          dbt deps
+          dbt run --models silver.* --debug
+
+      - name: Incremental load Gold
+        working-directory: dbt
+        run: |
+          dbt deps
+          dbt run --models gold.* --debug
+
       
      
       
