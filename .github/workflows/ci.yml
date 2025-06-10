@@ -63,7 +63,11 @@ jobs:
       - name: Debug dbt config
         working-directory: dbt
         run: dbt debug
-      
+
+      - name: Create all Streams from raw
+        working-directory: dbt
+        run: dbt run-operation create_streams_from_raw
+
       - name: Create all Streams from Bronze
         working-directory: dbt
         run: dbt run-operation create_streams_from_bronze
