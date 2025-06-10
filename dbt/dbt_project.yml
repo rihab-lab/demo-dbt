@@ -12,7 +12,11 @@ models:
       +materialized: table
     silver:
       +materialized: table
-
+    operations:
+      raw_to_bronze_proc:
+       vars:
+          pipe_table_name: 'PRC_CAMPAIGN_RAW'
+          unique_key: ['HouseKey','CampaignCode']  # ou juste 'HouseKey' si simple
 vars:
   SF_DATABASE: TEST_POC_VISEO_DB
   SF_SCHEMA: RAW_LAYER
@@ -21,6 +25,7 @@ vars:
   - name: pipe_prc_campaign
     stage: EXTERNAL_AZURE_STAGE
     table: PRC_CAMPAIGN_RAW
+    unique_key: ['APUKCODE']
     pattern: ".*PRC_CAMPAIGN_.*\\.csv"
     columns:
       - HouseKey
@@ -39,6 +44,7 @@ vars:
   - name: pipe_prc_benchmark
     stage: EXTERNAL_AZURE_STAGE
     table: PRC_BENCHMARK_RAW
+    unique_key: ['HouseKey','CampaignCode']
     pattern: ".*PRC_BENCHMARK_.*\\.csv"
     columns:
       - APUKCODE

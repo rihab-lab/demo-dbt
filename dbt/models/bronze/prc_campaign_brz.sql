@@ -1,1 +1,1 @@
-{{ generate_bronze_merge_model('PRC_CAMPAIGN_RAW', ['HouseKey']) }}
+--{{ generate_bronze_merge_model('PRC_CAMPAIGN_RAW', ['HouseKey']) }}

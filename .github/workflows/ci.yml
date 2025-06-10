@@ -67,6 +67,13 @@ jobs:
       - name: Create all Streams from raw
         working-directory: dbt
         run: dbt run-operation create_streams_from_raw
+      
+      - name: Publish single all-merge proc
+        working-directory: dbt
+        run: |
+          dbt deps
+          dbt run --models operations.raw_to_bronze_all
+
 
       - name: Create all Streams from Bronze
         working-directory: dbt
